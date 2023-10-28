@@ -1,7 +1,7 @@
 import responseCode from "../constants/responseCode.js";
-import {UserModel} from "../schema/index.js";
+import { UserModel } from "../schema/index.js";
 import bcrypt from "bcrypt";
-import serverConfig  from "../constants/serverConfig.js";
+import serverConfig from "../constants/serverConfig.js";
 import jwt from 'jsonwebtoken';
 
 class AuthService {
@@ -59,7 +59,7 @@ class AuthService {
     static login(user_body) {
         return new Promise(async (resolve, reject) => {
             try {
-                if (!user_body && (!user_body.username ||  !user_body.email) && !user_body.password) {
+                if (!user_body && (!user_body.username || !user_body.email) && !user_body.password) {
                     resolve({
                         message: "Insufficient Parameters",
                         messageCode: 422
@@ -76,25 +76,53 @@ class AuthService {
                         contact_number: user_body.contact_number
                     }
                     ]
-                }).exec();
+                }, { password: 0 }).exec();
                 if (user) {
-                   if(bcrypt.compare(user_body.password,user.password)){
-                    let payload = {
-                        _id: user.user_id,
-                        uername: user.user_name,
-                        email: user.email,
-                        expires: Date.now() + parseInt(serverConfig.expiresIn)
+                    if (bcrypt.compare(user_body.password, user.password)) {
+                        let payload = {
+                            _id: user.user_id,
+                            uername: user.user_name,
+                            email: user.email,
+                            expires: Date.now() + parseInt(serverConfig.expiresIn)
+                        }
+                        const token = jwt.sign(JSON.parse(JSON.stringify(payload)), serverConfig.secrettoken);
+                        resolve({
+                            messageCode: responseCode["200"],
+                            content: { user, token }
+                        });
                     }
-                    const token = jwt.sign(JSON.parse(JSON.stringify(payload)), serverConfig.secrettoken);
-                    resolve({
-                        messageCode: responseCode["200"],
-                        content: {user,token}
-                    });
-                   }     
-                }else{
+                } else {
                     resolve({
                         messageCode: 404,
                         message: 'Incorrect credentials'
+                    });
+                }
+
+
+            } catch (error) {
+                console.log(error)
+                reject({
+                    messageCode: 500,
+                    message: "Server Error.."
+                });
+            }
+        });
+    }
+
+    static getUserDataUsingToken(accessToken) {
+        return new Promise(async (resolve, reject) => {
+            try {
+                let payload = jwt.verify(accessToken, serverConfig.secrettoken);
+                if (payload && payload._id && payload.email) {
+                    const user = await UserModel.findOne({user_id:payload._id}, { password: 0 }).exec();
+                    resolve({
+                        messageCode: responseCode["200"],
+                        content: user
+                    });
+                } else {
+                    resolve({
+                        messageCode: 401,
+                        message: 'Not authorized'
                     });
                 }
 

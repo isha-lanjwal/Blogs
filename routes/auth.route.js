@@ -32,5 +32,24 @@ router.post('/login', async (req, res, next) => {
   }
 });
 
+router.get('/get_user_by_token', async (req, res, next) => {
+  try {
+    const authHeader = req.headers.authorization;
+    if (authHeader) {
+      const token = authHeader.split(' ')[1];
+      const result = await AuthService.getUserDataUsingToken(token);
+      if (result.messageCode == 401) {
+        res.status(401).send(result);
+      } else {
+        res.status(200).send(result);
+      }
+    } else {
+        res.statud(401);
+    }
+  } catch (error) {
+    return next(error);
+  }
+});
+
 //forgot password, reset password
 export default router;
