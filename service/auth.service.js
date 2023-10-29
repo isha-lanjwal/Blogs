@@ -109,7 +109,7 @@ class AuthService {
         });
     }
 
-    static getUserDataUsingToken(accessToken) {
+    static getUserDetails(user) {
         return new Promise(async (resolve, reject) => {
             try {
                 let payload = jwt.verify(accessToken, serverConfig.secrettoken);
