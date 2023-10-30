@@ -97,6 +97,11 @@ class AuthService {
                             message: 'Incorrect credentials'
                         });
                     }
+                }else{
+                    resolve({
+                        messageCode: 404,
+                        message: 'User Not Found'
+                    });
                 }
 
 
