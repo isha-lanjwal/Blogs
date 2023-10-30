@@ -76,9 +76,10 @@ class AuthService {
                         contact_number: user_body.contact_number
                     }
                     ]
-                }, { password: 0 }).exec();
+                }).exec();
                 if (user) {
-                    if (bcrypt.compare(user_body.password, user.password)) {
+                    const validPassword = await bcrypt.compare(user_body.password, user.password);
+                    if (validPassword) {
                         let payload = {
                             _id: user.user_id,
                             uername: user.user_name,
@@ -90,12 +91,12 @@ class AuthService {
                             messageCode: responseCode["200"],
                             content: { user, token }
                         });
+                    } else {
+                        resolve({
+                            messageCode: 404,
+                            message: 'Incorrect credentials'
+                        });
                     }
-                } else {
-                    resolve({
-                        messageCode: 404,
-                        message: 'Incorrect credentials'
-                    });
                 }
 
 
@@ -114,7 +115,7 @@ class AuthService {
             try {
                 let payload = jwt.verify(accessToken, serverConfig.secrettoken);
                 if (payload && payload._id && payload.email) {
-                    const user = await UserModel.findOne({user_id:payload._id}, { password: 0 }).exec();
+                    const user = await UserModel.findOne({ user_id: payload._id }, { password: 0 }).exec();
                     resolve({
                         messageCode: responseCode["200"],
                         content: user

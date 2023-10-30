@@ -8,6 +8,8 @@ import {connectDb}  from './schema/index.js';
 import  routes  from './routes/index.js';
 const app = express();
 const PORT = process.env.PORT || serverConfig.port;
+app.use(express.json());
+app.use(express.urlencoded({extended: true}))
 app.use(cors());
 app.set('port', PORT);
 app.use(bodyParser.json({ limit: '20mb' }));
