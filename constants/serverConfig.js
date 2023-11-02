@@ -3,6 +3,6 @@ const serverConfig = {
     port: 8000,
     saltRounds: 10,
     secrettoken: "demo-123",
-    expiresIn: "1d", //unit >> miliseconds
+    expiresIn: "3600000000000", //unit >> miliseconds
 };
 export default serverConfig;

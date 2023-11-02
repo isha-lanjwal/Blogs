@@ -1,3 +1,4 @@
-import auth from './auth.route.js'
+import auth from './public/auth.route.js'
+import user from './private/user.route.js'
 
-export default {auth}
+export default {auth,user}

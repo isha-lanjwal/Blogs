@@ -3,6 +3,7 @@ import { UserModel } from "../schema/index.js";
 import bcrypt from "bcrypt";
 import serverConfig from "../constants/serverConfig.js";
 import jwt from 'jsonwebtoken';
+import passport from 'passport';
 
 class AuthService {
     static addUser(user_body) {
@@ -56,58 +57,42 @@ class AuthService {
         });
     }
 
-    static login(user_body) {
+    static async login(req, res) {
         return new Promise(async (resolve, reject) => {
             try {
-                if (!user_body && (!user_body.username || !user_body.email) && !user_body.password) {
+                const { username, password } = req.body;
+                if (!username || !password) {
                     resolve({
-                        message: "Insufficient Parameters",
-                        messageCode: 422
+                        messageCode: 400,
+                        message: "Insufficient parameters, provide username and password"
                     });
-                }
-                const user = await UserModel.findOne({
-                    $or: [{
-                        email: user_body.email
-                    },
-                    {
-                        username: user_body.username
-                    },
-                    {
-                        contact_number: user_body.contact_number
-                    }
-                    ]
-                }).exec();
-                if (user) {
-                    const validPassword = await bcrypt.compare(user_body.password, user.password);
-                    if (validPassword) {
-                        let payload = {
-                            _id: user.user_id,
-                            uername: user.user_name,
-                            email: user.email,
-                            expires: Date.now() + parseInt(serverConfig.expiresIn)
+                } else {
+                    passport.authenticate('local', { session: false }, async (err, user) => {
+                        if (err) {
+                            resolve({
+                                messageCode: err.messageCode,
+                                message: err.message
+                            });
+                        } else {
+                            let payload = {
+                                _id: user._id,
+                                user_id: user.user_id,
+                                username: user.username,
+                                email: user.email,
+                                expires: Date.now() + parseInt(serverConfig.expiresIn)
+                            }
+                            const token = jwt.sign(JSON.parse(JSON.stringify(payload)), serverConfig.secrettoken);
+                            resolve({
+                                messageCode: responseCode["200"],
+                                content: { user, token }
+                            });
                         }
-                        const token = jwt.sign(JSON.parse(JSON.stringify(payload)), serverConfig.secrettoken);
-                        resolve({
-                            messageCode: responseCode["200"],
-                            content: { user, token }
-                        });
-                    } else {
-                        resolve({
-                            messageCode: 404,
-                            message: 'Incorrect credentials'
-                        });
-                    }
-                }else{
-                    resolve({
-                        messageCode: 404,
-                        message: 'User Not Found'
-                    });
+
+                    })(req, res);
                 }
-
-
             } catch (error) {
                 console.log(error)
-                reject({
+                return next({
                     messageCode: 500,
                     message: "Server Error.."
                 });
@@ -115,24 +100,34 @@ class AuthService {
         });
     }
 
-    static getUserDetails(user) {
+    static findUser(username) {
         return new Promise(async (resolve, reject) => {
             try {
-                let payload = jwt.verify(accessToken, serverConfig.secrettoken);
-                if (payload && payload._id && payload.email) {
-                    const user = await UserModel.findOne({ user_id: payload._id }, { password: 0 }).exec();
+                if (!username) {
+                    reject({
+                        message: `Insufficient Parameters`,
+                        messageCode: 422
+                    });
+                }
+                // username can be email or username
+                let user = await UserModel.findOne({
+                    $or: [{
+                        username: username
+                    }, {
+                        email: username
+                    }],
+                }).exec();
+                if (user) {
                     resolve({
-                        messageCode: responseCode["200"],
+                        messageCode: 200,
                         content: user
                     });
                 } else {
                     resolve({
-                        messageCode: 401,
-                        message: 'Not authorized'
-                    });
+                        messageCode: 404,
+                        messgae: "User does not exist"
+                    })
                 }
-
-
             } catch (error) {
                 console.log(error)
                 reject({

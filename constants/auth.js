@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
 import { UserModel } from "../schema/index.js";
-import serverConfig from "../constants/serverConfig.js";
+import serverConfig from "./serverConfig.js";
 
 const auth = async (req, res, next) => {
     try {
@@ -41,5 +41,4 @@ const auth = async (req, res, next) => {
     }
 
 }
-
-export default auth;
+export default auth
