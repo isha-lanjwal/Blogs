@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import UserModel from './user.schema.js';
+import BlogModel from './blog.schema.js';
 import mongoConfig  from '../constants/mongoConfig.js';
 
 const connectDb = () => {
@@ -9,5 +10,5 @@ const connectDb = () => {
   });
 };
 
-export {connectDb,UserModel}
+export {connectDb,UserModel,BlogModel}
 

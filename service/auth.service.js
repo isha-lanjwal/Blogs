@@ -12,7 +12,8 @@ class AuthService {
                 if (!user_body || !user_body.username || !user_body.first_name || !user_body.last_name || !user_body.email || !user_body.contact_number || !user_body.password) {
                     resolve({
                         message: "Insufficient Parameters",
-                        messageCode: 422
+                        messageCode: 200,
+                        success: false
                     });
                 }
                 const oldUser = await UserModel.countDocuments({
@@ -29,8 +30,9 @@ class AuthService {
                 }).exec();
                 if (oldUser) {
                     resolve({
-                        messageCode: 409,
-                        message: 'User Already Exists'
+                        messageCode: 200,
+                        message: 'User Already Exists',
+                        success: false
                     });
                 } else {
                     let user = new UserModel(user_body);
@@ -42,7 +44,8 @@ class AuthService {
                     delete user.password;
                     resolve({
                         messageCode: responseCode["200"],
-                        message: "User registered successfully."
+                        message: "User registered successfully.",
+                        success: true
                     });
                 }
 
@@ -63,8 +66,9 @@ class AuthService {
                 const { username, password } = req.body;
                 if (!username || !password) {
                     resolve({
-                        messageCode: 400,
-                        message: "Insufficient parameters, provide username and password"
+                        messageCode: 200,
+                        message: "Insufficient parameters, provide username and password",
+                        success: false
                     });
                 } else {
                     passport.authenticate('local', { session: false }, async (err, user) => {
@@ -84,7 +88,8 @@ class AuthService {
                             const token = jwt.sign(JSON.parse(JSON.stringify(payload)), serverConfig.secrettoken);
                             resolve({
                                 messageCode: responseCode["200"],
-                                content: { user, token }
+                                content: { user, token },
+                                success: true
                             });
                         }
 
@@ -120,12 +125,14 @@ class AuthService {
                 if (user) {
                     resolve({
                         messageCode: 200,
-                        content: user
+                        content: user,
+                        success: true
                     });
                 } else {
                     resolve({
-                        messageCode: 404,
-                        messgae: "User does not exist"
+                        messageCode: 200,
+                        messgae: "User does not exist",
+                        success: false
                     })
                 }
             } catch (error) {

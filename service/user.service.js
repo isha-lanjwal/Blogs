@@ -6,19 +6,22 @@ class UserService {
                 if (!user.user_id) {
                     reject({
                         message: `Insufficient Parameters`,
-                        messageCode: 422
+                        messageCode: 200,
+                        success: false
                     });
                 }
                 let userData = await UserModel.findOne({user_id: user.user_id},{password:0}).exec();
                 if (userData) {
                     resolve({
                         messageCode: 200,
-                        content: userData
+                        content: userData,
+                        success: true
                     });
                 } else {
                     resolve({
-                        messageCode: 404,
-                        messgae: "User does not exist"
+                        messageCode: 200,
+                        messgae: "User does not exist",
+                        success: false
                     })
                 }
             } catch (error) {

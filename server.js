@@ -30,6 +30,8 @@ app.use(bodyParser.json({ limit: '20mb' }));
 app.use(serverConfig.baseUrl + 'auth', routes.auth);
 const authCheck =  passport.authenticate('jwt', { session: false });
 app.use(serverConfig.baseUrl + 'user',authCheck, routes.user);
+app.use(serverConfig.baseUrl + 'blog',authCheck,routes.blog);
+app.use(serverConfig.baseUrl + '',routes.public_blog);
 connectDb()
     .then(() => {
         app.listen(PORT, () => {

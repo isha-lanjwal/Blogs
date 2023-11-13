@@ -43,11 +43,11 @@ passport.use(new JWTStrategy({
   (req, jwtPayload, done) => {
     if (Date.now() > jwtPayload.expires) {
       return done({
-        messageCode: 440,
+        messageCode: 200,
         message: 'Session Time-out'
       });
-    }
-    req = jwtPayload;
-    return done(null, jwtPayload);
+    }else{
+      return done(null,jwtPayload);
+    }    
   }
 ));
