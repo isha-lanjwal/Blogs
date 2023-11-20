@@ -6,7 +6,7 @@ class UserService {
                 if (!user.user_id) {
                     reject({
                         message: `Insufficient Parameters`,
-                        messageCode: 200,
+                        messageCode: 402,
                         success: false
                     });
                 }
@@ -19,7 +19,7 @@ class UserService {
                     });
                 } else {
                     resolve({
-                        messageCode: 200,
+                        messageCode: 404,
                         messgae: "User does not exist",
                         success: false
                     })

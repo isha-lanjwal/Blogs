@@ -12,7 +12,7 @@ class AuthService {
                 if (!user_body || !user_body.username || !user_body.first_name || !user_body.last_name || !user_body.email || !user_body.contact_number || !user_body.password) {
                     resolve({
                         message: "Insufficient Parameters",
-                        messageCode: 200,
+                        messageCode: 402,
                         success: false
                     });
                 }
@@ -30,7 +30,7 @@ class AuthService {
                 }).exec();
                 if (oldUser) {
                     resolve({
-                        messageCode: 200,
+                        messageCode: 409,
                         message: 'User Already Exists',
                         success: false
                     });
@@ -66,7 +66,7 @@ class AuthService {
                 const { username, password } = req.body;
                 if (!username || !password) {
                     resolve({
-                        messageCode: 200,
+                        messageCode: 402,
                         message: "Insufficient parameters, provide username and password",
                         success: false
                     });

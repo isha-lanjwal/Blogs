@@ -6,14 +6,14 @@ class BlogService {
                 if (!data.title || !data.description || !data.content || !data.user_id) {
                     reject({
                         message: `Insufficient Parameters`,
-                        messageCode: 200,
+                        messageCode: 402,
                         success: false
                     });
                 }
                 let blogData = await BlogModel.findOne({ title: data.title }).exec()
                 if (blogData) {
                     resolve({
-                        messageCode: 200,
+                        messageCode: 409,
                         message: "Blog with the same title already exist.",
                         success: false
                     })
@@ -63,11 +63,11 @@ class BlogService {
 
     static deleteBlog(data) {
         return new Promise(async (resolve, reject) => {
-            try{
+            try {
                 if (!data.id) {
                     reject({
                         message: `Insufficient Parameters`,
-                        messageCode: 200,
+                        messageCode: 402,
                         success: false
                     });
                 } else {
@@ -78,14 +78,59 @@ class BlogService {
                         resolve({ success: false, messageCode: 200, message: 'Blog not found or not authorized to delete' })
                     }
                 }
-            }catch (error) {
+            } catch (error) {
                 console.log(error)
                 reject({
                     messageCode: 500,
                     message: "Server Error.."
                 });
             }
-            
+
+        })
+    }
+
+    static editBlog(data) {
+        return new Promise(async (resolve, reject) => {
+            try {
+                if (!data._id) {
+                    reject({
+                        message: `Insufficient Parameters`,
+                        messageCode: 402,
+                        success: false
+                    });
+                } else {
+                    let userBlog = await BlogModel.findOne({
+                        _id: data._id, user_id: data.user_id
+                    }).exec();
+                    if (userBlog) {
+                        let blogData = await BlogModel.findOne({ title: data.title }).exec()
+                        if (blogData) {
+                            resolve({
+                                messageCode: 409,
+                                message: "Blog with the same title already exist.",
+                                success: false
+                            })
+                        } else {
+                            await BlogModel.findOneAndUpdate({
+                                _id: data._id, user_id: data.user_id
+                            }, { $set: data}).exec();
+                            resolve({
+                                messageCode:200,
+                                content: 'Blog Updated!!'
+                            })
+                        }
+                    } else {
+                        resolve({ success: false, messageCode: 200, message: 'Blog not found or not authorized to delete' })
+                    }
+                }
+            } catch (error) {
+                console.log(error)
+                reject({
+                    messageCode: 500,
+                    message: "Server Error.."
+                });
+            }
+
         })
     }
 }
