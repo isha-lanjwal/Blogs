@@ -116,7 +116,8 @@ class BlogService {
                             }, { $set: data}).exec();
                             resolve({
                                 messageCode:200,
-                                content: 'Blog Updated!!'
+                                content: 'Blog Updated!!',
+                                success:true
                             })
                         }
                     } else {
