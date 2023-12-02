@@ -31,7 +31,9 @@ app.use(serverConfig.baseUrl + 'auth', routes.auth);
 const authCheck =  passport.authenticate('jwt', { session: false });
 app.use(serverConfig.baseUrl + 'user',authCheck, routes.user);
 app.use(serverConfig.baseUrl + 'blog',authCheck,routes.blog);
+app.use(serverConfig.baseUrl + 'blog_ratings',authCheck,routes.blog_rating);
 app.use(serverConfig.baseUrl + '',routes.public_blog);
+app.use(serverConfig.baseUrl + '',routes.public_blog_rating);
 connectDb()
     .then(() => {
         app.listen(PORT, () => {

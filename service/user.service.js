@@ -4,7 +4,7 @@ class UserService {
         return new Promise(async (resolve, reject) => {
             try {
                 if (!user.user_id) {
-                    reject({
+                    resolve({
                         message: `Insufficient Parameters`,
                         messageCode: 402,
                         success: false

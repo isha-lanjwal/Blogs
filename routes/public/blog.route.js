@@ -1,3 +1,4 @@
+// return average rating in blog list
 import express from 'express';
 import BlogService from '../../service/blog.service.js';
 const router = express.Router();

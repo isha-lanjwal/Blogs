@@ -109,7 +109,7 @@ class AuthService {
         return new Promise(async (resolve, reject) => {
             try {
                 if (!username) {
-                    reject({
+                    resolve({
                         message: `Insufficient Parameters`,
                         messageCode: 422
                     });

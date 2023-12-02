@@ -2,6 +2,7 @@ import mongoose from 'mongoose';
 import UserModel from './user.schema.js';
 import BlogModel from './blog.schema.js';
 import mongoConfig  from '../constants/mongoConfig.js';
+import BlogRatingModel from './blog_rating.scheme.js';
 
 const connectDb = () => {
   return mongoose.connect(process.env.DB || mongoConfig.url, {
@@ -10,5 +11,5 @@ const connectDb = () => {
   });
 };
 
-export {connectDb,UserModel,BlogModel}
+export {connectDb,UserModel,BlogModel,BlogRatingModel}
 
